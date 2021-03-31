@@ -1,0 +1,68 @@
+.payping-detail-content {
+    box-sizing: border-box;
+    width: 98%;
+    min-height: 500px;
+    background-color: #fff;
+    padding: 15px;
+    border: 1px solid #c7c7c7;
+    border-radius: 5px;
+}
+
+button.success-paid {
+    background-color: hsl(102deg 75% 44%);
+    color: #fff;
+    border: navajowhite;
+    padding: 10px 15px;
+    vertical-align: middle;
+    border-radius: 3px;
+	margin: 0 -25px -30px 0;
+}
+
+button.faild-paid {
+    background-color: hsl(0deg 75% 44%);
+    color: #fff;
+    border: navajowhite;
+    padding: 10px 15px;
+    vertical-align: middle;
+    border-radius: 3px;
+    margin: 0 -25px -30px 0;
+}
+
+div.hr {
+    border-bottom: 1px solid #e7e7e7;
+    width: 85%;
+    float: left;
+    margin: 26px;
+}
+
+.ppd-col-input-place {
+    display: inline-block;
+    width: calc(50% - 15px );
+    border: 1px solid #e7e7e7;
+	margin-bottom: 15px;
+    padding: 10px 15px;
+    box-sizing: border-box;
+    border-radius: 5px;
+    color: #bbbbbb;
+}
+
+span.ppd-title-input-place {
+    width: 30%;
+    display: inline-block;
+}
+
+span.ppd-value-input-place {
+    width: 70%;
+    display: inline-block;
+	direction: ltr;
+	color: #000;
+}
+
+.ppd-desc-details {
+    background: hsl(220deg 16% 96%);
+    min-height: 60px;
+    padding: 1px 10px;
+    border: 1px solid hsl(220deg 16% 96%);
+    width: calc( 100% - 25px );
+    box-sizing: border-box;
+}
