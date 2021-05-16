@@ -67,7 +67,7 @@ class PayPingAPIS
             $this->PayPing_Debug_Log( $response, $Text );
         }
         if( is_wp_error( $response ) ){
-            return $code = 500;
+            return 500;
         }else{
             return $response;
         }
@@ -250,4 +250,11 @@ class PayPingAPIS
 		}
 	}
     
+	/* Start UnVerifiedPayment */
+    public function UnVerifiedPayment( $params ){
+        $Response = self::PayPingRequest( '/v1/pay/UnVerifiedPayment', 'get', $params, 'UnVerifiedPayment' );
+        return $Response;
+    }
+    /* End UnVerifiedPayment */
+	
 }

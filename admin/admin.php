@@ -11,6 +11,7 @@ class PayPingAdminPage{
     public function PayPing_WP_Plugin_Menu(){
         add_menu_page( __( 'پی‌پینگ' ), __( 'پی‌پینگ', '' ), 'manage_options', 'payping', array( $this, 'PayPing_WP_Plugin_Main_Page' ), PPD_GPPDIRU .'/assets/images/logo.png', 32 );
         add_submenu_page( 'payping' , __( 'تراکنش‌ها' ), __( 'تراکنش‌ها', '' ), 'manage_options', 'payping-transactions', array( $this, 'PayPing_WP_Plugin_Transactions_Page' ) );
+		add_submenu_page('payping', 'مغایرت گیری', 'مغایرت گیری', 'manage_options', 'payping-deposite', array( $this, 'PayPing_WP_Plugin_Deposit_Page' ));
 //        add_submenu_page( 'payping', __( 'همکاری در فروش' ), __( 'همکاری در فروش', '' ), 'manage_options', 'payping-affiliate', array( $this, 'PayPing_WP_Plugin_Affiliate_Page' ) );
         add_submenu_page( 'payping', __( 'تنظیمات' ), __( 'تنظیمات', '' ), 'manage_options', 'payping-setting', array( $this, 'PayPing_WP_Plugin_Settings_Page' ) );
         remove_submenu_page( 'payping','payping' );
@@ -25,6 +26,19 @@ class PayPingAdminPage{
            require_once(PPD_GPPDIR . '/admin/transactions/report.php');
         }else{
            require_once(PPD_GPPDIR . 'admin/transactions/reports.php');
+        }
+        echo '</div>';
+    }
+    /* End Transactions Page */
+	
+	/* Start Transactions Page */
+    public function PayPing_WP_Plugin_Deposit_Page(){
+        echo '<div class="wrap">';
+        _e( '<h2>مغایرت گیری</h2>', 'PayPing' );
+        if( isset( $_GET['code'] ) && !empty( $_GET['code'] && $_GET['page'] === 'payping-transactions' ) ){
+           require_once(PPD_GPPDIR . '/admin/deposit/deposit-single.php');
+        }else{
+           require_once(PPD_GPPDIR . 'admin/deposit/deposit-order.php');
         }
         echo '</div>';
     }
@@ -63,6 +77,29 @@ class PayPingAdminPage{
                        <th scope="row"><label for="blogname">توکن پی‌پینگ</label></th>
                        <td>
                            <input type="text" class="regular-text" name="PayPing_TokenCode" placeholder="<?php _e('توکن پی‌پینگ', 'PayPing'); ?>" value="<?php echo get_option('PayPing_TokenCode'); ?>" style="text-align:left;">
+                       </td>
+                   </tr>
+                    <tr>
+                       <th scope="row"><label for="blogname">مغایرت‌گیری خودکار</label></th>
+                       <td>
+                          <select name="PayPing_Deposit" id="PayPing_Deposit">
+                             <option value="deactive" <?php if( get_option('PayPing_Deposit') === 'deactive' ) echo 'selected'; ?>><?php _e('غیرفعال', 'PayPing'); ?></option>
+                             <option value="active" <?php if( get_option('PayPing_Deposit') === 'active' ) echo 'selected'; ?>><?php _e('فعال', 'PayPing'); ?></option>
+                          </select>
+                          <p class="description" id="home-description" style="padding: 10px 0 10px 15px;color: #0080ff;">
+                               <b>این مورد آزمایشی است و فقط برای 50 سفارش آخر ووکامرس عمل می‌کند! </b>    
+                           </p>
+                       </td>
+                   </tr>
+                   <tr>
+                       <th scope="row"><label for="blogname">بازه مغایرت‌گیری(ساعت)</label></th>
+                       <td>
+                          <select name="PayPing_DepositT" id="PayPing_DepositT">
+                             <option value="1" <?php if( get_option('PayPing_DepositT') === '1' ) echo 'selected'; ?>><?php _e('1 ساعت', 'PayPing'); ?></option>
+                             <option value="3" <?php if( get_option('PayPing_DepositT') === '3' ) echo 'selected'; ?>><?php _e('3 ساعت', 'PayPing'); ?></option>
+                             <option value="6" <?php if( get_option('PayPing_DepositT') === '6' ) echo 'selected'; ?>><?php _e('6 ساعت', 'PayPing'); ?></option>
+                             <option value="12" <?php if( get_option('PayPing_DepositT') === '12' ) echo 'selected'; ?>><?php _e('12 ساعت', 'PayPing'); ?></option>
+                          </select>
                        </td>
                    </tr>
                    <tr>
@@ -104,6 +141,8 @@ class PayPingAdminPage{
         register_setting( 'PayPing_WP_Plugin_Settings', 'PayPing_TokenCode', $text_args );
         register_setting( 'PayPing_WP_Plugin_Settings', 'PayPing_DebugMode', $text_args );
         register_setting( 'PayPing_WP_Plugin_Settings', 'PayPing_DebugUrl', $text_args );
+        register_setting( 'PayPing_WP_Plugin_Settings', 'PayPing_Deposit', $text_args );
+        register_setting( 'PayPing_WP_Plugin_Settings', 'PayPing_DepositT', $text_args );
     }
     /* End Settings In Wordpress */
     
@@ -114,7 +153,7 @@ class PayPingAdminPage{
         $price = 0;
 //        $Balance = wp_cache_get( 'PayPingBalance', 'payping', true );
         $Balance = get_transient( 'PayPingBalance' );
-        if( false === $Balance ){
+        if( false == $Balance ){
             $parent = new PayPingAPIS();
             $balance = json_decode( wp_remote_retrieve_body( $parent->GetBalance() ) );
             $price = $balance->result;
@@ -123,7 +162,12 @@ class PayPingAdminPage{
         }else{
 			$price = $Balance;
 		}
-        $title = 'موجودی پی‌پینگ: '.number_format($price, 0, "،", "،"). ' تومان';
+		if( isset( $price ) && !empty( $price ) ){
+			$title = 'موجودی پی‌پینگ: '.number_format($price, 0, "،", "،"). ' تومان';
+		}else{
+			$title = 'عدم موجودی';
+		}
+        
         $argsB = array(
             'id'    => 'payping_balance',
             'title' => $title,

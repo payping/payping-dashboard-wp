@@ -60,6 +60,3 @@ if( $code === 200 ){
 		</div>
 	</div>
 </div>
-<?php else{
-    echo $parent->status_message( $code );
-}
