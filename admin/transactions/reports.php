@@ -3,32 +3,74 @@ if( isset( $_GET['action'] ) && $_GET['action'] === 'settle' ){
     require_once( PPD_GPPDIR . 'admin/transactions/settle.html.php');
     return;
 }
-$limit           = 10;
+$limit           = 15;
 if( !isset( $_GET['p'] ) || $_GET['p'] <= 1){
     $offset = 0;
 }else{
     $offset = ( $_GET['p'] - 1 )*$limit;
 }
-$Filter          = array();
-$transactionType = 0;
-$FromDate        = null;
-$ToDate          = null;
+$Filter           = array();
+$transactionType  = 0;
+$FromDate         = null;
+$ToDate           = null;
+$cardNumber       = null;
+$payerName        = null;
+$code             = null;
+$payerPhoneNumber = null;
+$amount           = 0;
+
+if( isset( $_POST['searchtrsnatn'] ) ){
+	if( isset( $_POST['amount'] ) && ! empty( $_POST['amount'] ) ){
+		$amount = $_POST['amount'];
+	}
+	
+	if( isset( $_POST['code'] ) && ! empty( $_POST['code'] ) ){
+		$code = $_POST['code'];
+	}
+	
+	if( isset( $_POST['payerName'] ) && ! empty( $_POST['payerName'] ) ){
+		$payerName = $_POST['payerName'];
+	}
+	
+	if( isset( $_POST['payerPhoneNumber'] ) && ! empty( $_POST['payerPhoneNumber'] ) ){
+		$payerPhoneNumber = $_POST['payerPhoneNumber'];
+	}
+	
+	if( isset( $_POST['cardNumber'] ) && ! empty( $_POST['cardNumber'] ) ){
+		$cardNumber = $_POST['cardNumber'];
+	}
+}
 
 $params = array(
-    'offset'            => $offset,
-    'limit'             => $limit,
-    'Filter'            => $Filter,
-    'transactionType'   => $transactionType,
-    'FromDate'          => $FromDate,
-    'ToDate'            => $ToDate
+ 	"amount"           => $amount,
+    "code"             => $code,
+    "fromDate"         => $FromDate,
+    "toDate"           => $ToDate,
+    "limit"            => $limit,
+    "offset"           => $offset,
+    "payerName"        => $payerName,
+    "cardNumber"       => $cardNumber,
+	"paymentStatus"    => $transactionType,
+	"payerPhoneNumber" => $payerPhoneNumber
 );
-$parent = new PayPingAPIS();
-$response = $parent->TransactionReport( $params );
 
+$parent = new PayPingAPIS();
+$response = $parent->AdvancedTransactionReport( $params );
 $code = wp_remote_retrieve_response_code( $response );
 if( $code === 200 ){
     $Transactions = json_decode( wp_remote_retrieve_body( $response ), true );
 ?>
+<h3>جستجوی تراکنش</h3>
+<form method="post">
+	<p>
+		<input type="text" name="amount" placeholder="مبلغ به تومان" dir="ltr"> 
+		<input type="text" name="code" placeholder="کد پرداخت" dir="ltr">
+		<input type="text" name="payerName" placeholder="نام پرداخت کننده">
+		<input type="text" name="payerPhoneNumber" placeholder="شماره تلفن پرداخت کننده" dir="ltr">
+		<input type="text" name="cardNumber" placeholder="شماره کارت پرداخت کننده" dir="ltr">
+		<input type="submit" value="جستجو" class="button" name="searchtrsnatn">
+	</p>
+</form>
 <table class="form-table" style="border: 1px solid #fff; margin-bottom: 25px;">
     <thead>
         <tr style="text-align: center; background-color:#fff;">
@@ -107,8 +149,9 @@ if( $code === 200 ){
     </tfooter>
 </table>
 <?php
-$response = $parent->TransactionReportCount( $params );
+$response = $parent->AdvancedTransactionReportCount( $params );
 $Total = json_decode( wp_remote_retrieve_body( $response ) );
+	
 class pp_pagination {
 	private $total = 0;
 	private $per_page = 50;

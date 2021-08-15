@@ -209,6 +209,20 @@ class PayPingAPIS
         return $Response;
     }
     /* End TransactionReport */
+	
+	/* Start AdvancedTransactionReport */
+    public function AdvancedTransactionReportCount( $params ){
+        $Response = self::PayPingRequest( '/v2/report/AdvancedTransactionReportCount', 'post', $params, 'TransactionsListCount' );
+        return $Response;
+    }
+    /* End AdvancedTransactionReport */
+	
+	/* Start AdvancedTransactionReport */
+    public function AdvancedTransactionReport( $params ){
+        $Response = self::PayPingRequest( '/v2/report/AdvancedTransactionReport', 'post', $params, 'TransactionsList' );
+        return $Response;
+    }
+    /* End AdvancedTransactionReport */
     
     /* Start TransActionDetails */
     public function TransActionDetails( $PaymentCode ){

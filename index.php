@@ -51,7 +51,7 @@ if( get_option('PayPing_Deposit') == 'active' ){
 	
 	function pp_aouto_deposit(){
 		$wc_orders = wc_get_orders( array(
-			'limit'          => 50,
+			'limit'          => 100,
 			'meta_key'       => '_payping_payCode',
 			'payment_method' => array('WC_payping', 'WC_payping_Ghesta'),
 			'status'         => array( 'pending', 'on-hold', 'cancelled', 'failed' ),

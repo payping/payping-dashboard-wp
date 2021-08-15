@@ -33,7 +33,7 @@ if( isset( $_GET['PayCode'] ) && $_GET['action'] === 'process' ){
 		<thead>
 			<tr>
                 <th style="text-align:center;" >تاریخ </th>
-                <th style="text-align:center;" >کد پرداخت</th>
+                <th style="text-align:center;" >شماره پرداخت</th>
                 <th style="text-align:center;" >شناسه فاکتور</th>
                 <th style="text-align:center;" >مبلغ</th>
                 <th style="text-align:center;">وضعیت</th>
@@ -44,7 +44,7 @@ if( isset( $_GET['PayCode'] ) && $_GET['action'] === 'process' ){
 <?php
 $wc_orders = wc_get_orders( array(
     'limit'          => -1,
-	'meta_key'       => '_payping_payCode',
+	'meta_key'       => 'woo_payping_refid',
 	'payment_method' => array('WC_payping', 'WC_payping_Ghesta'),
 	'status'         => array( 'pending', 'on-hold', 'cancelled', 'failed' ),
 ) );
@@ -84,7 +84,7 @@ if( $wc_orders ){
 		<tfoot>
 			<tr>
                 <th style="text-align:center;" >تاریخ </th>
-                <th style="text-align:center;" >کد پرداخت</th>
+                <th style="text-align:center;" >شماره پرداخت</th>
                 <th style="text-align:center;" >شناسه فاکتور</th>
                 <th style="text-align:center;" >مبلغ</th>
                 <th style="text-align:center;">وضعیت</th>
