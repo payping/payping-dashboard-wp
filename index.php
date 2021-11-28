@@ -12,19 +12,24 @@ if (!defined('ABSPATH'))
 define( 'PPD_GPPDIR', plugin_dir_path( __FILE__ ) );
 define( 'PPD_GPPDIRU', plugin_dir_url(__FILE__) );
 
-/**
- * Register and enqueue a custom stylesheet in the WordPress admin.
- */
-function ppd_enqueue_assets_admin_style() {
-	wp_register_style( 'ppd_report_detail_wp_admin', PPD_GPPDIRU . 'assets/css/reposrt-detail.css', false, null );
-	if( isset( $_GET['page'] ) && $_GET['page'] == 'payping-transactions' && isset( $_GET['code'] ) ){
-		wp_enqueue_style( 'ppd_report_detail_wp_admin' );
+class PayPing_Dashboard_IN_WP{
+	public function __construct(){
+		add_action('admin_enqueue_scripts', array($this, 'enqueueAssets'));
 	}
+	/**
+	 * Register and enqueue a custom stylesheet in the WordPress admin.
+	*/
+	public function enqueueAssets(){
+		wp_register_style( 'ppd_report_detail_wp_admin', PPD_GPPDIRU.'assets/css/reposrt-detail.css', array(), false, null );
+		wp_enqueue_style( 'ppd_report_detail_wp_admin' );	
+	}
+    // More methods
 }
-add_action( 'admin_enqueue_scripts', 'ppd_enqueue_assets_admin_style' );
+new PayPing_Dashboard_IN_WP();
 
-include_once( PPD_GPPDIR . "includes/PayPing.php" );
-include_once( PPD_GPPDIR . "admin/admin.php" );
+include_once(PPD_GPPDIR."includes/PayPing.php");
+include_once(PPD_GPPDIR."admin/admin.php");
+require_once(PPD_GPPDIR.'admin/ajax-handler/ajax-reports.php');
 new PayPingAdminPage();
 if( get_option('PayPing_Deposit') == 'active' ){
 	add_filter( 'cron_schedules', 'PayPing_check_deposit_custom_time' );
@@ -48,7 +53,6 @@ if( get_option('PayPing_Deposit') == 'active' ){
 	function custom_time_event_func(){
 		pp_aouto_deposit();
 	}
-	
 	function pp_aouto_deposit(){
 		$wc_orders = wc_get_orders( array(
 			'limit'          => 100,

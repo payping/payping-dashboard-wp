@@ -5,6 +5,7 @@ class PayPingAdminPage{
         add_action( 'admin_bar_menu',  array( $this, 'PayPing_WP_Admin_Bar_Menu' ), 999 );
         add_action( 'admin_menu', array( $this, 'PayPing_WP_Plugin_Menu' ) );
         add_action( 'admin_init', array( $this, 'PayPing_WP_Plugin_Settings' ) );
+        add_action( 'admin_init', array( $this, 'set_total_transactions' ) );
     }
     
     /* Start Create Menu In Dashboard Wordpress */
@@ -186,4 +187,46 @@ class PayPingAdminPage{
 		add_action( 'admin_bar_menu', 'admin_bar_item', 500 );
     }
     /* End Balance In Wordpress */
+
+    /** update total transactions */
+    public function set_total_transactions(){
+        $parent = new PayPingAPIS();
+        $params = array(
+            "clientsInfos"     => array(),
+            "filter"           => array(),
+            "transactionType"  => 6,
+            "fromDate"         => null,
+            "toDate"           => null
+        );
+       /* insert data in db */
+       $response = $parent->AdvancedTransactionReportCount( $params );
+       $Total = json_decode( wp_remote_retrieve_body( $response ), true );
+       $Old_Total = get_option('payping_total_transactions');
+       if( $Old_Total != $Total || $Old_Total === false ){
+           update_option('payping_total_transactions', $Total['result']);
+       }
+       $this->insert_transactions_indb();
+    }
+
+    private function insert_transactions_indb(){
+        if(!get_option('payping_transactions_table', false)){
+            global $wpdb;
+            $table_name = $wpdb->prefix.'payping_transactions';
+            if($wpdb->get_var("SHOW TABLES LIKE '". $table_name ."'"  ) != $table_name ){
+                $sql  = 'CREATE TABLE '.$table_name.'(
+                id INT(20) AUTO_INCREMENT,
+                details VARCHAR(255),
+                client_id VARCHAR(255),
+                type VARCHAR(255),
+                time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                PRIMARY KEY(id))';
+
+                if(!function_exists('dbDelta')) {
+                    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+                }
+                dbDelta($sql);
+                update_option('payping_transactions_table', true);
+            }
+        }
+    }
 }

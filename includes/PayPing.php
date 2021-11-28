@@ -211,7 +211,7 @@ class PayPingAPIS
     /* End TransactionReport */
 	
 	/* Start AdvancedTransactionReport */
-    public function AdvancedTransactionReportCount( $params ){
+    public function AdvancedTransactionReportCount( $params = array() ){
         $Response = self::PayPingRequest( '/v2/report/AdvancedTransactionReportCount', 'post', $params, 'TransactionsListCount' );
         return $Response;
     }
